@@ -1,0 +1,377 @@
+                        +--------------------+
+                        |        CS 439      |
+                        | PROJECT 1: THREADS |
+                        |   DESIGN DOCUMENT  |
+                        +--------------------+
+
+
+The questions in this design document should reflect the design of the code you
+wrote for the project.  Your grade will reflect both the quality of your answer
+in this document and the quality of the design implementation in your code.  You
+may receive partial credit for answering questions for parts of the project that
+you did not get to implement, but you must indicate in your answer that there is
+no corresponding implementation, or you will not receive any credit.
+
+
+For each question, you should include both the name of the file(s), function
+name(s), and the line numbers where the relevant code may be found.
+
+
+These design documents should be completed individually.  Group members are
+welcome to use this document as a guide for design and are welcome to discuss
+the questions, but there should be no group notes or other sorts of copying of
+design documents.
+
+
+When you have completed your design document, submit it to the Canvas assignment
+Project 1 Design and Documentation.  ***Your submission must be a text file and
+each line must not extend past 80 characters.  In addition, your submission must
+contain all of the original material and not exceed 17,000 characters.  The
+character count will be measured using the Linux command wc.  (Note that rtf
+files are NOT text files.)
+
+
+---- Name ----
+
+
+>> Fill your name, UT EID, CS login, email address, and unique number:
+
+
+Name: Mark Ellis
+EID: mme839
+CS login: mark
+Email: mark.m.ellis@utexas.edu
+Unique Number: 51525
+
+Slip days used on this project:
+
+
+---- GROUP ----
+
+
+>> Fill the names, UT EIDs, CS logins, email addresses, and unique numbers
+>> of your group members.  Also fill in each person's ranking on the 
+>> partner evaluation scale, as determined by you.
+
+
+Name1: Jared Rankin
+EID1: jlr5723
+CS login: jrankin
+Email: jrankin@cs.utexas.edu
+Unique Number: 51525
+Ranking (scale below):
+Excellent
+
+
+Name2: David Lambert
+EID2: del892
+CS login: dlambert
+Email: dlambert@cs.utexas.edu
+Unique Number: 51525
+Ranking (scale below):
+Excellent
+
+
+---- PARTNER EVALUATION SCALE ----
+
+
+>> Excellent: Consistently went above and beyond - tutored others, carried
+>> more than his/her fair share of the load.
+
+>> Very Good: Consistently did what he/she was supposed to do, very well
+>> prepared and cooperative.
+
+>> Satisfactory: Usually did what he/she was supposed to do, minimally
+>> prepared and cooperative.
+
+>> Marginal: Sometimes failed to show up and/or rarely prepared.
+
+>> Deficient: Often failed to show up and/or rarely prepared.
+
+>> Unsatisfactory: Consistently failed to show up and/or unprepared.
+
+>> Superficial: Practically no participation.
+
+>> No Show: No participation at all.
+
+
+---- PRELIMINARIES ----
+
+>> If you have any preliminary comments on your submission or notes for the
+>> TAs,  please give them here.
+
+
+>> Please cite any offline or online sources you consulted while
+>> preparing your submission, other than the Pintos documentation, course
+>> text, lecture notes, and course staff.
+
+
+                             ALARM CLOCK
+                             ===========
+
+
+---- DATA STRUCTURES ----
+
+
+>> A1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', ‘#define’, or
+>> enumeration that was necessary for your implementation of alarm
+>> clock.  Identify the purpose of each in 25 words or less.
+
+// This struct carries all the needed information for the sleeping threads.
+struct sleep_time
+   {
+     struct list_elem elem;
+     struct thread *sleeping_thread;  
+     struct semaphore sleeping_sema;  
+     int64_t finish_ticks;  
+   };
+
+//This is a list to carry all of the sleeping threads
+static struct list sleep_time_list;
+
+---- ALGORITHMS ----
+
+
+>> A2: Briefly describe what happens when a thread calls timer_sleep(),
+>> including the steps necessary to wake a thread (hint: timer_interrupt).
+
+interrupts is immediatley checked if it is on. A calculation of the sum 
+of the ticks passed to timer_sleep() and the current OS time in ticks is
+ stored in a variable in order to find out when this thread should be 
+woken up. That time is compared to the current OS time. If the OS time 
+is >= to the wakeup time then thread continues and exits the method. If 
+the OS time is less than the wake up time, we disable interrupts, store 
+all information about the thread including the wake up time for that 
+thread into a struct. That thread then is put into a global list of 
+sleeping threads ordered by the wake up time. The struct we created uses a
+ semphore to wake up the thread when the wake up time has occured. 
+Everytime, timer_interrupt is invoked, given that there are elements in 
+our list of sleeping threads, the top thread of our sleeping list wake up 
+time is compared with the current OS time to see if we can wake it up. If 
+it is time to wake up, the thread is popped from the list and we call sema 
+up from created struct that carries the thread to wake up the thread. The 
+list is then checked again to see if we can wake anymore threads up. If not 
+then thread_tick() is invoked and we exit the method. 
+
+
+>> A3: What steps are taken to minimize the amount of time spent in
+>> the timer interrupt handler?
+
+We only check the list if it is not empty and only pop the threads from our 
+sleeping threads that have a wake up time less than or equal to the current 
+OS time. Since our list is in order we only need to pop the top of the list 
+instead of looking through the whole list. 
+
+
+---- SYNCHRONIZATION ----
+
+
+>> A4: How are race conditions avoided when multiple threads call
+>> timer_sleep() simultaneously?  Describe the race conditions.
+
+Anytime we are adjusting any variable that is shared between threads, we 
+disable interrupts. The race condition in our code is when we are inserting
+ a thread into our sleeping list. If 2 or more threads load the list before 
+the list is updated then we will not have every thread in the list that we 
+need and will never wake some threads.
+
+
+>> A5: How are race conditions avoided when a timer interrupt occurs
+>> during a call to timer_sleep()?  Describe the race conditions. 
+
+like the call to timer_sleep() we also disable interrupts during the 
+critical poritions. The race condition is if 2 threads try to access our 
+global list of sleeping threads and load the list one after another. 
+
+
+
+
+
+---- RATIONALE ----
+
+
+>> A6: Why did you choose this design?  In what ways is it superior to
+>> another design you considered?  Be certain to compare between two
+>> working designs.
+
+This design has better CPU utilization by letting the threads sleep for a 
+given amount of ticks without interrupting other threads. Our prior design
+would have been in the interrupt handler much longer. 
+
+
+
+
+                         PRIORITY SCHEDULING
+                         ===================
+
+
+---- DATA STRUCTURES ----
+
+
+>> B1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', ‘#define’, or
+>> enumeration that was necessary for your implementation of priority
+>> scheduling and priority donation.  
+>> Identify the purpose of each in 25 words or less.
+
+struct thread 
+  {
+    ...
+    struct thread *donee;               /* Current donee. NULL if none. */
+    struct list priority_donors;        /* Threads donating priority here. */
+    int donated_priority;               /* Priority donated. */
+    ...
+  } 
+
+struct priority_donor
+  {
+    struct list_elem elem;              /* For list compatibility. */
+    struct thread *donor;               /* Donor of the priority. */
+    struct lock *reason;                /* Reason for the donation. */
+  };
+
+
+
+
+---- ALGORITHMS ----
+
+
+>> B2: How do you ensure that the highest priority thread waiting for
+>> a lock, semaphore, or condition variable wakes up first?  
+>> Explain for all three.
+For semphores, while interrupts are disabled, we have a list of waiting threads 
+for semaphores. We sort this list in descending order by priority. We grab the 
+top element from the list, call thread_unblock() which inserts the thread into 
+the ready queue. For locks, after priority donation implimentation. we call 
+sema_up() passing the argument of a semaphore of a lock. The the sema_up(), 
+while interrupts are disabled, we have a list of waiting threads for semaphores.
+We sort this list in descending order by priority. We grab the top element from 
+the list, call thread_unbloc() which inserts the thread into the ready queue.
+For conditon variables, we have a list of waiting threads for a conditon 
+variable. we sort this list in descending order priority. We pop the first 
+element in the list which is a thread and pass the semaphore of that to 
+sema_up.
+
+
+>> B3: Describe the sequence of events when a call to lock_acquire()
+>> causes a priority donation.  How is nested donation handled?
+
+synch.c:211 lock_acquire()
+We check to see that we are passing a valid lock, we are not in an
+interrupt context and that the current thread is holding the lock.
+We disable interrupts and then grab the current threads
+If we have a thread holding the lock then we get the priority of the
+current thread and the priority of the holder of the lock. If current
+thread priority is greater than holder thread priority we make a call 
+to thread_donate_priority passing both priorities and the lock that is
+being held.
+If the lock is not previously held then, the current thread will hold
+the lock by calling call sema_down(). And then we enable interrupts.
+
+thread.c:411 thread_donate_priority()
+we enable interrupts. We create priority_donor struct and tore it in
+the heap. In this struct we store thread of the donor, the lock it is
+trying to acquire. We store thread that current thread is donating to.
+Order the list of the priority donors of the thread being donated to. Then
+we store the donated priority in its own int element we created in the struct
+thread. Sorting the ready queue list and enabling interrupts is the last thing
+we do. If the thread that is getting donating to does not have any threads that
+itself is donating to then we make a call to thread_propagate_donation() passing
+the arguments the thread that is current thread and thread it is donating to. 
+
+thread.c:550 thread_propagate_donation()
+This method is where we handle our nested donation. we order the list of the 
+priority donors list of the thread that is getting the donation. Then we grab
+the the front of that list  and we place that into a new priority_ donor struct.
+We next store the priority of the donor from that struct into the thread we are
+currently donating to. If the thread that is being donated to has a thread that 
+itself is also donating it's priority to then we make a recursive call passing
+the arguments of currrent thread that is being donated to as the thread that is 
+donating and the next thread being donated from the current thread that is being 
+donated to as the current thread that is being donated to. 
+
+
+
+
+>> B4: Describe the sequence of events when lock_release() is called
+>> on a lock on which a higher-priority thread is waiting.  What happens to
+>> the priority of the thread releasing the lock?
+
+synch.c:261 lock_release()
+We disable interrupts. We call a method thread_undonate_by_lock (thread_current
+(), lock) passing arguments of the currren thread and the lock it is holding. 
+
+thread.c:469 thread_undonate_by_lock()
+After storing the the priority_donors list of the current thread we disable
+interrupts. We check this list to see which thread has the highest priority,
+since we have sorted this list in descending order by priority we just grab the
+front element of the list and make sure that its the right lock. We release any
+threads attached to the thread that is giving up the lock and take that thread
+out of any donations list and take precautions for memory leaks. We go through
+every list to make sure we have notified any threads that are waiting on the
+lock that it has been released to another thread. turn interrups back on.  
+
+
+
+---- SYNCHRONIZATION ----
+
+
+>> B5: Describe a potential race in thread_set_priority() and explain
+>> how your implementation avoids it.  Can you use a lock to avoid
+>> this race? 
+
+A potential race condition would be when setting the value of the thread
+priority between the new_priority that is passed to the method and any threads
+that is attempting to donate it's priority to the that same thread. We avoided
+this by disabling the interrupts during this portion. 
+
+
+---- RATIONALE ----
+
+
+>> B6: Why did you choose this design for your priority scheduling and
+>> donation?  In what ways is it superior to another design you considered?
+>> Please make certain you discuss both priority scheduling and donation, and
+>> be certain to compare against working designs.
+
+Our priority scheduling was pretty simple with just ordering the read_list in
+descending order by priority and scheduling the top thread from that list. We
+chose this for simplicity. Our design for donation took more code but made it
+easier to follow through the life cycle of the threads. Compared to a previous
+version that we came up with that would have a global list of each thread that
+would have all donation affiliation threads. 
+
+
+
+
+
+                           SURVEY QUESTIONS
+                           ================
+
+
+Answering these questions is optional, but it will help us improve the
+course in future semesters.  Feel free to tell us anything you
+want--these questions are just to spur your thoughts.  You may also
+choose to respond anonymously in the course evaluations at the end of
+the semester.
+
+
+>> In your opinion, was this assignment, or any one of the two problems
+>> in it, too easy or too hard?  Did it take too long or too little time?
+
+
+>> Did you find that working on a particular part of the assignment gave
+>> you greater insight into some aspect of OS design?
+
+
+>> Is there some particular fact or hint we should give students in
+>> future semesters to help them solve the problems?  Conversely, did you
+>> find any of our guidance to be misleading?
+
+
+>> Do you have any suggestions for the TAs to more effectively assist00000000000
+>> students, either for future semesters or the remaining projects?
+
+
+>> Any other comments?

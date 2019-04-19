@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/psh.X.dir/psh.c.o CMakeFiles/psh.X.dir/util.c.o  -o psh.X 

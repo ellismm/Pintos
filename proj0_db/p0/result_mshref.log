@@ -1,0 +1,246 @@
+pid=20992
+#
+# trace01.txt - Properly terminate on EOF.
+#
+--- End of trace01 ---
+
+pid=20994
+#
+# trace02.txt - Process builtin quit command.
+#
+--- End of trace02 ---
+
+pid=20996
+#
+# trace03.txt - Run a foreground job.
+#
+msh> quit
+--- End of trace03 ---
+
+pid=20999
+#
+# trace04.txt - Run a background job.
+#
+msh> ./myspin 1 &
+[1] (21001) ./myspin 1 &
+--- End of trace04 ---
+
+pid=21006
+#
+# trace05.txt - Process jobs builtin command.
+#
+msh> ./myspin 2 &
+[1] (21008) ./myspin 2 &
+msh> ./myspin 3 &
+[2] (21010) ./myspin 3 &
+msh> jobs
+[1] (21008) Running ./myspin 2 &
+[2] (21010) Running ./myspin 3 &
+--- End of trace05 ---
+
+pid=21054
+#
+# trace06.txt - Forward SIGINT to foreground job.
+#
+msh> ./myspin 4
+Job [1] (21056) terminated by signal 2
+--- End of trace06 ---
+
+pid=21062
+#
+# trace07.txt - Forward SIGINT only to foreground job.
+#
+msh> ./myspin 4 &
+[1] (21064) ./myspin 4 &
+msh> ./myspin 5
+Job [2] (21066) terminated by signal 2
+msh> jobs
+[1] (21064) Running ./myspin 4 &
+--- End of trace07 ---
+
+pid=21087
+#
+# trace08.txt - Forward SIGTSTP only to foreground job.
+#
+msh> ./myspin 4 &
+[1] (21089) ./myspin 4 &
+msh> ./myspin 5
+Job [2] (21091) stopped by signal 20
+msh> jobs
+[1] (21089) Running ./myspin 4 &
+[2] (21091) Stopped ./myspin 5 
+--- End of trace08 ---
+
+pid=21109
+#
+# trace09.txt - Process bg builtin command
+#
+msh> ./myspin 4 &
+[1] (21111) ./myspin 4 &
+msh> ./myspin 5
+Job [2] (21113) stopped by signal 20
+msh> jobs
+[1] (21111) Running ./myspin 4 &
+[2] (21113) Stopped ./myspin 5 
+msh> bg %2
+[2] (21113) ./myspin 5 
+msh> jobs
+[1] (21111) Running ./myspin 4 &
+[2] (21113) Running ./myspin 5 
+--- End of trace09 ---
+
+pid=21129
+#
+# trace10.txt - Process fg builtin command. 
+#
+msh> ./myspin 4 &
+[1] (21131) ./myspin 4 &
+msh> fg %1
+Job [1] (21131) stopped by signal 20
+msh> jobs
+[1] (21131) Stopped ./myspin 4 &
+msh> fg %1
+msh> jobs
+--- End of trace10 ---
+
+pid=21152
+#
+# trace11.txt - Forward SIGINT to every process in foreground process group
+#
+msh> ./mysplit 4
+Job [1] (21154) terminated by signal 2
+msh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1440 tty7     Ss+  1581:28 /usr/lib/xorg/Xorg -core :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+20205 pts/2    Ss     0:00 -bash
+21151 pts/2    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace11.txt -g -s ./msh -a -p
+21152 pts/2    S+     0:00 ./msh -p
+21161 pts/2    R      0:00 /bin/ps a
+28569 tty1     Ss+    0:00 /sbin/agetty --noclear tty1 linux
+--- End of trace11 ---
+
+pid=21163
+#
+# trace12.txt - Forward SIGTSTP to every process in foreground process group
+#
+msh> ./mysplit 4
+Job [1] (21165) stopped by signal 20
+msh> jobs
+[1] (21165) Stopped ./mysplit 4 
+msh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1440 tty7     Ss+  1581:28 /usr/lib/xorg/Xorg -core :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+20205 pts/2    Ss     0:00 -bash
+21162 pts/2    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace12.txt -g -s ./msh -a -p
+21163 pts/2    S+     0:00 ./msh -p
+21165 pts/2    T      0:00 ./mysplit 4
+21166 pts/2    T      0:00 ./mysplit 4
+21174 pts/2    R      0:00 /bin/ps a
+28569 tty1     Ss+    0:00 /sbin/agetty --noclear tty1 linux
+--- End of trace12 ---
+
+pid=21176
+#
+# trace13.txt - Restart every stopped process in process group
+#
+msh> ./mysplit 4
+Job [1] (21178) stopped by signal 20
+msh> jobs
+[1] (21178) Stopped ./mysplit 4 
+msh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1440 tty7     Ss+  1581:28 /usr/lib/xorg/Xorg -core :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+20205 pts/2    Ss     0:00 -bash
+21175 pts/2    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -g -s ./msh -a -p
+21176 pts/2    S+     0:00 ./msh -p
+21178 pts/2    T      0:00 ./mysplit 4
+21179 pts/2    T      0:00 ./mysplit 4
+21187 pts/2    R      0:00 /bin/ps a
+28569 tty1     Ss+    0:00 /sbin/agetty --noclear tty1 linux
+msh> fg %1
+msh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1440 tty7     Ss+  1581:28 /usr/lib/xorg/Xorg -core :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+20205 pts/2    Ss     0:00 -bash
+21175 pts/2    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -g -s ./msh -a -p
+21176 pts/2    S+     0:00 ./msh -p
+21230 pts/2    R      0:00 /bin/ps a
+28569 tty1     Ss+    0:00 /sbin/agetty --noclear tty1 linux
+--- End of trace13 ---
+
+pid=21232
+#
+# trace14.txt - Simple error handling
+#
+msh> ./bogus
+./bogus: Command not found
+msh> ./myspin 4 &
+[1] (21236) ./myspin 4 &
+msh> fg
+fg command requires PID or %jobid argument
+msh> bg
+bg command requires PID or %jobid argument
+msh> fg a
+fg: argument must be a PID or %jobid
+msh> bg a
+bg: argument must be a PID or %jobid
+msh> fg 9999999
+(9999999): No such process
+msh> bg 9999999
+(9999999): No such process
+msh> fg %2
+%2: No such job
+msh> fg %1
+Job [1] (21236) stopped by signal 20
+msh> bg %2
+%2: No such job
+msh> bg %1
+[1] (21236) ./myspin 4 &
+msh> jobs
+[1] (21236) Running ./myspin 4 &
+--- End of trace14 ---
+
+pid=21265
+#
+# trace15.txt - Putting it all together
+#
+msh> ./bogus
+./bogus: Command not found
+msh> ./myspin 10
+Job [1] (21269) terminated by signal 2
+msh> ./myspin 3 &
+[1] (21276) ./myspin 3 &
+msh> ./myspin 4 &
+[2] (21278) ./myspin 4 &
+msh> jobs
+[1] (21276) Running ./myspin 3 &
+[2] (21278) Running ./myspin 4 &
+msh> fg %1
+Job [1] (21276) stopped by signal 20
+msh> jobs
+[1] (21276) Stopped ./myspin 3 &
+[2] (21278) Running ./myspin 4 &
+msh> bg %3
+%3: No such job
+msh> bg %1
+[1] (21276) ./myspin 3 &
+msh> jobs
+[1] (21276) Running ./myspin 3 &
+[2] (21278) Running ./myspin 4 &
+msh> fg %1
+msh> quit
+--- End of trace15 ---
+
+pid=21297
+#
+# trace16.txt - Tests whether the shell can handle SIGTSTP and SIGINT
+#     signals that come from other processes instead of the terminal.
+#
+msh> ./mystop 2
+Job [1] (21299) stopped by signal 20
+msh> jobs
+[1] (21299) Stopped ./mystop 2
+msh> ./myint 2
+Job [2] (21310) terminated by signal 2
+--- End of trace16 ---
+

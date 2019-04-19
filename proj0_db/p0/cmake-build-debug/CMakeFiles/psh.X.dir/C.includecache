@@ -1,0 +1,54 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/psh.c
+stdio.h
+-
+stdlib.h
+-
+unistd.h
+-
+string.h
+-
+ctype.h
+-
+signal.h
+-
+sys/types.h
+-
+sys/wait.h
+-
+errno.h
+-
+util.h
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/util.h
+
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/util.c
+string.h
+-
+stdlib.h
+-
+stdio.h
+-
+ctype.h
+-
+signal.h
+-
+sys/types.h
+-
+sys/wait.h
+-
+errno.h
+-
+unistd.h
+-
+util.h
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/util.h
+
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/util.h
+

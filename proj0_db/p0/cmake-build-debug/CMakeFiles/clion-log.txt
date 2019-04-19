@@ -1,0 +1,4 @@
+/srv/jlrdragon92000/swsupport/idea/clion-2018.1/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0"
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/cmake-build-debug

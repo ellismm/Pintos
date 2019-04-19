@@ -1,0 +1,4 @@
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/cmake-build-debug/CMakeFiles/edit_cache.dir
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/cmake-build-debug/CMakeFiles/psh.X.dir
+/var/home/jlrdragon92000/Documents/AU18/C S 439 PRINCIPLES OF COMPUTER SYS-C S/proj0-wd/p0/cmake-build-debug/CMakeFiles/msh.X.dir

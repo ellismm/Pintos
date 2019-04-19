@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/msh.X.dir/msh.c.o CMakeFiles/msh.X.dir/util.c.o CMakeFiles/msh.X.dir/jobs.c.o  -o msh.X 
